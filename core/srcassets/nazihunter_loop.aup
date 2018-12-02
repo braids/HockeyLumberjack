@@ -1,0 +1,27 @@
+<?xml version="1.0" standalone="no" ?>
+<!DOCTYPE project PUBLIC "-//audacityproject-1.3.0//DTD//EN" "http://audacity.sourceforge.net/xml/audacityproject-1.3.0.dtd" >
+<project xmlns="http://audacity.sourceforge.net/xml/" projname="nazihunter_loop_data" version="1.3.0" audacityversion="2.1.0" sel0="0.0000000000" sel1="26.4880045351" vpos="0" h="0.0000000000" zoom="43.0664062500" rate="44100.0" snapto="off" selectionformat="hh:mm:ss + milliseconds">
+	<tags/>
+	<wavetrack name="nazihunter" channel="2" linked="0" mute="0" solo="0" height="150" minimized="0" isSelected="1" rate="44100" gain="1.0" pan="0.0">
+		<waveclip offset="0.00000000">
+			<sequence maxsamples="262144" sampleformat="262159" numsamples="1168121">
+				<waveblock start="0">
+					<simpleblockfile filename="e0000946.au" len="139027" min="-0.328125" max="0.367188" rms="0.088531"/>
+				</waveblock>
+				<waveblock start="139027">
+					<simpleblockfile filename="e0000bf1.au" len="262144" min="-0.335938" max="0.390625" rms="0.107975"/>
+				</waveblock>
+				<waveblock start="401171">
+					<simpleblockfile filename="e00007c2.au" len="262144" min="-0.335938" max="0.367188" rms="0.108548"/>
+				</waveblock>
+				<waveblock start="663315">
+					<simpleblockfile filename="e0000218.au" len="262144" min="-0.34375" max="0.359375" rms="0.106363"/>
+				</waveblock>
+				<waveblock start="925459">
+					<simpleblockfile filename="e00005fe.au" len="242662" min="-0.328125" max="0.367188" rms="0.101024"/>
+				</waveblock>
+			</sequence>
+			<envelope numpoints="0"/>
+		</waveclip>
+	</wavetrack>
+</project>
