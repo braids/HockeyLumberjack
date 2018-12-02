@@ -1,5 +1,6 @@
 package com.braids.hockey.object;
 
+import com.braids.hockey.movement.MoveVector;
 import com.braids.hockey.particle.IceTrailEffect;
 
 import com.badlogic.gdx.Gdx;
@@ -11,7 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntArray;
 import com.braids.hockey.movement.AStar;
 
-public class Nazi extends GameObject {
+public class Nazi extends Skater {
     final TiledMapTileLayer terrain;
     final boolean[] blockMap;
     AStar astar;
@@ -19,19 +20,14 @@ public class Nazi extends GameObject {
     public Array<Vector2> smoothPath = new Array<Vector2>();
     Lumberjack target;
 
-    IceTrailEffect trailEffect;
-
     Sound dieSound, killSound;
 
     float recalcTimer = 0f;
-
 
     public Nazi(float x, float y, Lumberjack target, TiledMapTileLayer tLayer, boolean[] bMap) {
         super("nazi.png", x, y);
 
         this.target = target;
-
-        radius = (sprite.getWidth() + sprite.getHeight() ) / 4;
 
         this.blockMap = bMap;
         this.terrain = tLayer;
@@ -39,92 +35,96 @@ public class Nazi extends GameObject {
         dieSound = Gdx.audio.newSound(Gdx.files.internal("buy.wav"));
         killSound = Gdx.audio.newSound(Gdx.files.internal("buzz.wav"));
 
-        dAcc = 0f;
-        maxdAcc = 125f;
+        maxdAcc = 100f;
 
         astar = new AStar(terrain.getWidth(), terrain.getHeight()) {
             protected boolean isValid(int x, int y) {
                 return blockMap[x + y * terrain.getWidth()];
             }
         };
-
-        // Ice trail particle effects
-        trailEffect = new IceTrailEffect(getWorldOrigin(), new Vector2(0f, -12f));
-
     }
 
     public void update() {
-        // If no path to target found, skip updateEmitter
-        if (smoothPath.size == 0) {
+        // Clear movement input
+        clearMovement();
 
+        // update last world space position
+        lastPos = getWorldOrigin();
+
+        // Reset width of ice trail effect to narrow
+        trailEffect.setWidth(IceTrailEffect.TrailWidth.NARROW);
+
+        // If no current path and..
+        if (smoothPath.size == 0) {
+            // If target is close enough to self..
             if (getWorldOrigin().sub(target.getWorldOrigin()).len() < 200f) {
+                // Get a* path to target
                 path = astar.getPath(
                         (int) (getWorldOrigin().x / terrain.getTileWidth()),
                         (int) (getWorldOrigin().y / terrain.getTileHeight()),
                         (int) (target.getWorldOrigin().x / terrain.getTileWidth()),
                         (int) (target.getWorldOrigin().y / terrain.getTileHeight()));
 
+                // Store smoothed out path
                 smoothPath = astar.smoothPath;
 
+                // If path size is still 0 although we are near target..
                 if (smoothPath.size == 0) {
+                    // Clear path (???)
                     path.clear();
+                    // Add in target's position as next path location
                     path.add((int) target.getWorldOrigin().x, (int)target.getWorldOrigin().y);
                     smoothPath.add(target.getWorldOrigin());
                 }
             }
-
-            dAcc -= 2f;
-            dAcc = Math.max(dAcc, 0f);
-
-            acc.nor().scl(dAcc);
         }
+        // If there is a path..
         else {
+            // Get next position from end of path
             Vector2 nextPos = new Vector2(smoothPath.peek().x, smoothPath.peek().y);
 
-            // Scale back up to world coords
+            // Scale path position back up to world coords
             nextPos.scl(terrain.getTileWidth(),terrain.getTileHeight());
 
+            // If distance to next position is small enough..
             if (getWorldOrigin().sub(nextPos).len() < 5f) {
+                // Remove next position
                 smoothPath.pop();
 
+                // Bail if no more path locations
                 if(smoothPath.size <= 0)
                     return;
 
+                // Get next position from end of path
                 nextPos = new Vector2(smoothPath.peek().x, smoothPath.peek().y);
 
-                // Scale back up to world coords
+                // Scale path position back up to world coords
                 nextPos.scl(terrain.getTileWidth(), terrain.getTileHeight());
             }
 
+            // Get direction vector to next position
             Vector2 toNextPos = nextPos.sub(getWorldOrigin());
 
-            dAcc += 5f;
-            dAcc = Math.min(dAcc, maxdAcc);
-
-            toNextPos.nor().scl(dAcc);
-
-            acc.set(toNextPos);
+            if (Math.abs(MoveVector.Up.angle(toNextPos)) < 60f)
+                moveUp = true;
+            if (Math.abs(MoveVector.Down.angle(toNextPos)) < 60f)
+                moveDown = true;
+            if (Math.abs(MoveVector.Left.angle(toNextPos)) < 60f)
+                moveLeft = true;
+            if (Math.abs(MoveVector.Right.angle(toNextPos)) < 60f)
+                moveRight = true;
         }
 
-        sprite.setPosition(sprite.getX() + (acc.x  * Gdx.graphics.getDeltaTime()),
-                           sprite.getY() + (acc.y  * Gdx.graphics.getDeltaTime()));
+        // Perform movement actions
+        move();
 
+        // Recalculate path if the current path has taken too long
         recalcTimer += Gdx.graphics.getDeltaTime();
         if(recalcTimer >= 1f) {
             path.clear();
             smoothPath.clear();
             recalcTimer = 0f;
         }
-
-        // Start/restart ice trail particle effects
-        if (acc.isZero())
-            trailEffect.stop();
-        else
-            trailEffect.start();
-        trailEffect.setPosition(getWorldOrigin());
-
-        // Reset width of ice trail effect to narrow
-        trailEffect.setWidth(IceTrailEffect.TrailWidth.NARROW);
     }
 
     public boolean checkPuckCollision(PuckPool ppool) {

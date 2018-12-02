@@ -169,7 +169,7 @@ public class TerrainGenScreen implements Screen {
         //// Updates
 
         // Update player position
-        ljack.Update();
+        ljack.update();
 
         // Update nazi position
         for (Nazi nazi : nazis)

@@ -39,8 +39,8 @@ public class Lumberjack extends Skater {
         stick.setPositionAtOrigin(getWorldOrigin());
     }
 
-    public void Update() {
-        // Update last world space position
+    public void update() {
+        // update last world space position
         lastPos = getWorldOrigin();
 
         // Reset width of ice trail effect to narrow
@@ -49,7 +49,7 @@ public class Lumberjack extends Skater {
         // Perform movement actions
         move();
 
-        // Update pucks
+        // update pucks
         ppool.update();
 
         // Fire puck
@@ -64,7 +64,7 @@ public class Lumberjack extends Skater {
     public void checkCollision(Array<PolygonMapObject> blockingTerrain) {
         super.checkCollision(blockingTerrain);
 
-        // Update stick position
+        // update stick position
         stick.setPosition(getWorldOrigin().x - 8f, getWorldOrigin().y - getOrigin().y);
 
         // Run puck collision updateEmitter

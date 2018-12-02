@@ -2,7 +2,6 @@ package com.braids.hockey.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -49,7 +48,7 @@ public class LevelScreen implements Screen {
     public Lumberjack ljack;
 
     // Debug
-    DrawDebug drawDebug = new DrawDebug(true);
+    DrawDebug drawDebug = new DrawDebug(false);
 
     public LevelScreen(final GameInstance game, String mapFilename) {
         this.game = game;
@@ -165,7 +164,7 @@ public class LevelScreen implements Screen {
         //// Updates
 
         // Update player position
-        ljack.Update();
+        ljack.update();
 
         // Update nazi position
         for (Nazi nazi : nazis)
@@ -175,6 +174,7 @@ public class LevelScreen implements Screen {
         ljack.checkCollision(blockingTerrain);
         // Update nazi position
         for (Nazi nazi : nazis) {
+            nazi.checkCollision(blockingTerrain);
             if(nazi.checkPuckCollision(ljack.ppool))
                 nazis.removeValue(nazi, true);
             if(nazi.checkPlayerCollision(ljack)) {
@@ -184,6 +184,8 @@ public class LevelScreen implements Screen {
         }
 
         ljack.resolveCollisions();
+        for (Nazi nazi : nazis)
+            nazi.resolveCollisions();
 
         if(ljack.checkGoal(goal.getRectangle()))
             exitLevel();

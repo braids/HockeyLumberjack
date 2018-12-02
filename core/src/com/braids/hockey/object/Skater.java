@@ -123,7 +123,7 @@ public class Skater extends GameObject {
                     if (destArc < 0f)
                         acc.set(moveVec.cpy());
 
-                    // Update icing effect angle
+                    // update icing effect angle
                     icingEffect.setAngleLeft(acc.angle());
                 }
                 // If turning right
@@ -135,7 +135,7 @@ public class Skater extends GameObject {
                     if (destArc > 0f)
                         acc.set(moveVec.cpy());
 
-                    // Update icing effect angle
+                    // update icing effect angle
                     icingEffect.setAngleRight(acc.angle());
                 }
 
@@ -143,7 +143,7 @@ public class Skater extends GameObject {
                 if(sharpTurn)
                     trailEffect.setWidth(IceTrailEffect.TrailWidth.WIDE);
 
-                // Update icing effect state
+                // update icing effect state
                 icingEffect.updateState(sharpTurn);
             }
             else {
@@ -169,6 +169,13 @@ public class Skater extends GameObject {
         // Set position after acceleration calculated
         sprite.setPosition(sprite.getX() + (acc.x  * Gdx.graphics.getDeltaTime()),
                 sprite.getY() + (acc.y  * Gdx.graphics.getDeltaTime()));
+    }
+
+    public void clearMovement() {
+        moveUp = false;
+        moveDown = false;
+        moveLeft = false;
+        moveRight = false;
     }
 
     public void checkCollision(Array<PolygonMapObject> blockingTerrain) {
@@ -210,7 +217,7 @@ public class Skater extends GameObject {
             displacements.clear();
         }
 
-        // Update particles
+        // update particles
         trailEffect.setPosition(getWorldOrigin());
         icingEffect.setPosition(getWorldOrigin());
     }
